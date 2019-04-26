@@ -6,4 +6,4 @@ git add .
 git commit -m'-'
 git push origin master
 
-sgy "提交成功"
+say "提交成功"
