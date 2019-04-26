@@ -9,13 +9,13 @@ import (
 	"io/ioutil"
 	"flag"
 	"os"
-	_"strings"
 	"strings"
 )
 //用户输入配置
 var(
-	db_name string
-	path string
+	db_name string //数据库名称
+	path string		//结构体保存路径
+	tables string  //表名称
 )
 //表类型
 type Dbtabels struct{
@@ -33,6 +33,8 @@ type Column struct {
 func init() {
 	flag.StringVar(&db_name, "d", "", "# Database name")
 	flag.StringVar(&path, "path", "./models", "# Structure preservation path")
+	flag.StringVar(&tables, "t", "all", "# Table name formats such as - t user, rule, config")
+
 }
 
 func main(){
@@ -41,8 +43,11 @@ func main(){
 		flag.Usage()
 		return
 	}
+	tables = convtables(tables)//转换
+
 	fmt.Println("数据库:",db_name)
 	fmt.Println("结构体保存路径:",path)
+	fmt.Println("指定数生成据表:",tables)
 	fmt.Println("Automatic Struct Start ...")
 	if checkpath(path){
 		fmt.Println("paPath irregularityth  Example：'./models'")
@@ -57,7 +62,11 @@ func main(){
 		return
 	}
 	//获取所有表
-	rows,err2 := db.Query("select table_name from information_schema.tables where table_schema=?",db_name)
+	var sqls = "select table_name from information_schema.tables where table_schema=?"
+	if tables != "all"{
+		 sqls = fmt.Sprintf("select table_name from information_schema.tables where table_schema=? and table_name in (%s)",tables)
+	}
+	rows,err2 := db.Query(sqls,db_name)
 	if err2!=nil{
 		fmt.Println("mysql query err:",err2)
 		return
@@ -71,6 +80,7 @@ func main(){
 	table := Dbtabels{}
 	for rows.Next(){
 		err := rows.Scan(&table.Name)
+		fmt.Println("正在生成表结构：",table.Name)
 		if err != nil {
 			fmt.Printf("Scan failed,err:%v", err)
 			return
@@ -160,4 +170,22 @@ func checkpath(path string)bool{
 		return true
 	}
 
+}
+
+//用户输入转换
+func convtables(tab string)string{
+	if tab=="all"{
+		return tab
+	}else{
+		str_arr := strings.Split(tab, ",")
+		var tabs string
+		for _,v := range str_arr {
+			if v!=""{
+				item := fmt.Sprintf("'%s',",v)
+				tabs += item
+			}
+		}
+		//'mall_account','mall_goods'
+		return tabs[0:len(tabs)-1]
+	}
 }
