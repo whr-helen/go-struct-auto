@@ -13,7 +13,11 @@ import (
 )
 //用户输入配置
 var(
+	db_host string //数据库地址
+	db_port string //数据库端口
 	db_name string //数据库名称
+	db_account string //数据库账号
+	db_pwd string //数据库密码
 	path string		//结构体保存路径
 	tables string  //表名称
 )
@@ -31,6 +35,10 @@ type Column struct {
 }
 
 func init() {
+	flag.StringVar(&db_account, "acc", "root", "# Database account")
+	flag.StringVar(&db_pwd, "pwd", "123123", "# Database password")
+	flag.StringVar(&db_host, "host", "127.0.0.1", "# Database host")
+	flag.StringVar(&db_port, "port", "3306", "# Database port")
 	flag.StringVar(&db_name, "d", "", "# Database name")
 	flag.StringVar(&path, "path", "./models", "# Structure preservation path")
 	flag.StringVar(&tables, "t", "all", "# Table name formats such as - t user, rule, config")
@@ -46,6 +54,8 @@ func main(){
 	tables = convtables(tables)//转换
 
 	fmt.Println("数据库:",db_name)
+	fmt.Println("数据库账号:",db_account)
+	fmt.Println("数据库密码:",db_pwd)
 	fmt.Println("结构体保存路径:",path)
 	fmt.Println("指定数生成据表:",tables)
 	fmt.Println("Automatic Struct Start ...")
@@ -54,7 +64,7 @@ func main(){
 		return
 	}
 
-	dataSourceName := fmt.Sprintf("root:123123@/%s",db_name)
+	dataSourceName := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",db_account,db_pwd,db_host,db_port,db_name)
 	db, err := sql.Open("mysql", dataSourceName)
 
 	if err!=nil{

@@ -6,6 +6,14 @@
 
 注释：参数信息
 
+-host host 改为自己数据库的地址  （ 默认 127.0.0.1）
+
+-port port 改为自己数据库的端口  （ 默认 3306）
+
+-acc acc 改为自己数据库的账号  （ 默认 root）
+
+-pwd pwd 改为自己数据库的密码  （ 默认 123123）
+
 -d dbname 改为自己数据库的名称  （必填）
 
 -path ./models 改为存放路径   (可选默认为./models )
@@ -30,4 +38,4 @@
 命令(支持 linux or mac)： ./bin/automatic -d dbname -t account,user
 
 
-命令(支持 linux or mac or windows)： go run automatic.go -d dbname -t account,user
+命令(支持 linux or mac or windows)： go run automatic.go -d dbname -acc root -pwd 123123 -t account
